@@ -66,11 +66,3 @@ class HHEmployerAPI():
             all_vacancies.append(company_info)
 
         return all_vacancies
-
-if __name__ == "__main__":
-    api = HHEmployerAPI()
-
-    companies = api.get_employer("АльфаБанк")
-    print(companies)
-    vacancy = api.get_vacancies(companies[0]["id"])
-    print(vacancy)
