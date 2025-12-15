@@ -9,6 +9,7 @@ class HHEmployerAPI():
         """Функция для поиска компании по ее названию"""
 
         url = f"{self.BASE_URL}/employers"
+        companies = []
 
         params = {
             "text": company_name,
@@ -22,8 +23,6 @@ class HHEmployerAPI():
         if "items" not in data or not data["items"]:
             print(f"Компании по запросу '{company_name}' не найдены.")
             return []
-
-        companies = []
 
         for company in data["items"]:
             company_info = {
@@ -58,10 +57,13 @@ class HHEmployerAPI():
 
         for vacancy in data["items"]:
             company_info = {
+                "id_company": vacancy.get("employer").get("id"),
+                "id_vacancy": vacancy.get("id"),
                 "company_name": vacancy.get("employer").get("name"),
                 "vacancy": vacancy.get("name"),
-                "salary": vacancy.get("salary").get("from"),
-                "url": vacancy.get("alternate_url")
+                "salary_from": vacancy.get("salary").get("from"),
+                "salary_to": vacancy.get("salary").get("to"),
+                "url": vacancy.get("alternate_url"),
             }
             all_vacancies.append(company_info)
 
