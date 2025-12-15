@@ -5,7 +5,7 @@ class HHEmployerAPI():
 
     BASE_URL = "https://api.hh.ru"
 
-    def get_employer(self, company_name: str, only_with_vacancies: bool = True):
+    def get_employer(self, company_name: str, only_with_vacancies: bool = True, limit: int = 1):
         """Функция для поиска компании по ее названию"""
 
         url = f"{self.BASE_URL}/employers"
@@ -13,7 +13,8 @@ class HHEmployerAPI():
 
         params = {
             "text": company_name,
-            "only_with_vacancies": only_with_vacancies
+            "only_with_vacancies": only_with_vacancies,
+            "per_page": limit
         }
 
         company = requests.get(url, params=params, timeout=10)
@@ -24,7 +25,7 @@ class HHEmployerAPI():
             print(f"Компании по запросу '{company_name}' не найдены.")
             return []
 
-        for company in data["items"]:
+        for company in data["items"][:limit]:
             company_info = {
                 "id": company.get("id"),
                 "name": company.get("name"),
@@ -32,7 +33,7 @@ class HHEmployerAPI():
             }
             companies.append(company_info)
 
-        return companies
+        return company_info
 
 
     def get_vacancies(self, employer_id: str, only_with_salary: bool = True):
