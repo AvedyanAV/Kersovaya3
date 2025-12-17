@@ -1,40 +1,36 @@
 import requests
 
-class HHEmployerAPI():
+
+class HHEmployerAPI:
     """Класс для работы с api hh"""
 
     BASE_URL = "https://api.hh.ru"
 
-    def get_employer(self, company_name: str, only_with_vacancies: bool = True, limit: int = 1):
+    def get_employer(
+        self, company_name: str, only_with_vacancies: bool = True, limit: int = 1
+    ):
         """Функция для поиска компании по ее названию"""
 
         url = f"{self.BASE_URL}/employers"
-        companies = []
 
         params = {
             "text": company_name,
             "only_with_vacancies": only_with_vacancies,
-            "per_page": limit
+            "per_page": limit,
         }
 
         company = requests.get(url, params=params, timeout=10)
         company.raise_for_status()
         data = company.json()
 
-        if "items" not in data or not data["items"]:
-            print(f"Компании по запросу '{company_name}' не найдены.")
-            return []
-
         for company in data["items"][:limit]:
-            company_info = {
+            company = {
                 "id": company.get("id"),
                 "name": company.get("name"),
                 "open_vacancies": company.get("open_vacancies", 0),
             }
-            companies.append(company_info)
 
-        return company_info
-
+        return company
 
     def get_vacancies(self, employer_id: str, only_with_salary: bool = True):
         """Функция для поиска вакансии по id компании"""
@@ -42,9 +38,7 @@ class HHEmployerAPI():
         url = f"{self.BASE_URL}/vacancies"
         all_vacancies = []
 
-        params = {
-            "employer_id": employer_id
-        }
+        params = {"employer_id": employer_id}
         if only_with_salary:
             params["only_with_salary"] = True
 
@@ -52,13 +46,9 @@ class HHEmployerAPI():
         response.raise_for_status()
         data = response.json()
 
-        if "items" not in data or not data["items"]:
-               print(f"Вакансии не найдены.")
-               return []
-
         for vacancy in data["items"]:
             company_info = {
-                "id_company": vacancy.get("employer").get("id"),
+                "id_company": vacancy.get("employer", {}).get("id"),
                 "id_vacancy": vacancy.get("id"),
                 "company_name": vacancy.get("employer").get("name"),
                 "vacancy": vacancy.get("name"),
